@@ -1,0 +1,53 @@
+@use 'variables' as *;
+
+// Glitch fires once per cycle in the 92–99% window (~2s cycle = ~140ms glitch burst)
+@keyframes glitch-clip-1 {
+  0%, 91%, 100% { clip-path: inset(0 100% 0 0); transform: none; }
+  92%  { clip-path: inset(10% 0 75% 0); transform: translateX(-4px); }
+  93%  { clip-path: inset(55% 0 20% 0); transform: translateX( 4px); }
+  94%  { clip-path: inset(30% 0 50% 0); transform: translateX(-3px); }
+  95%  { clip-path: inset(80% 0  5% 0); transform: translateX( 3px); }
+  96%  { clip-path: inset(15% 0 70% 0); transform: translateX(-4px); }
+  97%  { clip-path: inset(60% 0 15% 0); transform: translateX( 2px); }
+  98%  { clip-path: inset(40% 0 40% 0); transform: translateX(-2px); }
+  99%  { clip-path: inset(0 100% 0 0);  transform: none; }
+}
+
+@keyframes glitch-clip-2 {
+  0%, 91%, 100% { clip-path: inset(0 100% 0 0); transform: none; }
+  92%  { clip-path: inset(65% 0 10% 0); transform: translateX( 3px); }
+  93%  { clip-path: inset(20% 0 60% 0); transform: translateX(-3px); }
+  94%  { clip-path: inset(45% 0 30% 0); transform: translateX( 4px); }
+  95%  { clip-path: inset( 5% 0 85% 0); transform: translateX(-4px); }
+  96%  { clip-path: inset(75% 0 15% 0); transform: translateX( 3px); }
+  97%  { clip-path: inset(35% 0 45% 0); transform: translateX(-2px); }
+  98%  { clip-path: inset(50% 0 25% 0); transform: translateX( 2px); }
+  99%  { clip-path: inset(0 100% 0 0);  transform: none; }
+}
+
+.glitch {
+  position: relative;
+  display: inline-block;
+
+  &::before,
+  &::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  &::before {
+    color: $color-glitch-r;
+    animation: glitch-clip-1 2s infinite;
+  }
+
+  &::after {
+    color: $color-glitch-b;
+    animation: glitch-clip-2 2s infinite;
+    animation-delay: 0.08s;
+  }
+}

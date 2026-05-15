@@ -1,0 +1,51 @@
+---
+layout: default
+---
+{% assign posts = paginator.posts | default: site.posts %}
+{% if posts.size > 0 %}
+  <ul class="post-feed">
+    {% for post in posts %}
+      <li class="post-item">
+        {% if post.category %}
+          <span class="category-badge category-badge--{{ post.category | slugify }}">
+            {{ post.category }}
+          </span>
+        {% endif %}
+        <h2 class="post-item__title">
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        </h2>
+        <p class="post-item__meta">
+          <time datetime="{{ post.date | date_to_xmlschema }}">
+            {{ post.date | date: "%B %-d, %Y" }}
+          </time>
+        </p>
+        {% if post.excerpt %}
+          <p class="post-item__excerpt">
+            {{ post.excerpt | strip_html | truncatewords: 40 }}
+          </p>
+        {% endif %}
+        <a class="read-more" href="{{ post.url | relative_url }}">Read more &rarr;</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% if paginator.total_pages > 1 %}
+    <nav class="pagination">
+      {% if paginator.previous_page %}
+        <a class="pagination__link pagination__link--prev" href="{{ paginator.previous_page_path | relative_url }}">&larr; Newer</a>
+      {% else %}
+        <span class="pagination__link pagination__link--prev pagination__link--disabled">&larr; Newer</span>
+      {% endif %}
+
+      <span class="pagination__info">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+
+      {% if paginator.next_page %}
+        <a class="pagination__link pagination__link--next" href="{{ paginator.next_page_path | relative_url }}">Older &rarr;</a>
+      {% else %}
+        <span class="pagination__link pagination__link--next pagination__link--disabled">Older &rarr;</span>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% else %}
+  <p>No posts yet — check back soon.</p>
+{% endif %}

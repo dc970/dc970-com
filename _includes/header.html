@@ -1,0 +1,14 @@
+<header class="site-header">
+  <div class="container">
+    <div class="site-header__brand">
+      <a class="site-title glitch" href="{{ '/' | relative_url }}" data-text="{{ site.title }}">{{ site.title }}</a>
+      {% if site.tagline %}
+        <span class="site-tagline">// {{ site.tagline }}</span>
+      {% endif %}
+    </div>
+    <nav class="site-nav">
+      <a href="{{ '/about/' | relative_url }}">About</a>
+      <a href="https://discord.gg/qxxxUhYbT5" target="_blank" rel="noopener">Discord</a>
+    </nav>
+  </div>
+</header>

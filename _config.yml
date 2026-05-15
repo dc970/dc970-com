@@ -1,0 +1,41 @@
+title: DC970
+tagline: Northern Colorado Security Community
+description: A community for security professionals and enthusiasts in northern Colorado, meeting monthly to share knowledge, tools, and research.
+baseurl: ""
+url: ""
+
+author:
+  name: DC970
+
+markdown: kramdown
+highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-paginate-v2
+
+pagination:
+  enabled: true
+  per_page: 5
+  permalink: '/page/:num/'
+  sort_field: date
+  sort_reverse: true
+
+permalink: /posts/:title/
+
+defaults:
+  - scope:
+      path: "_posts"
+      type: "posts"
+    values:
+      layout: post
+
+exclude:
+  - Dockerfile
+  - docker-compose.yml
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - usage.md
+  - CLAUDE.md
