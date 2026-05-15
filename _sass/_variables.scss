@@ -1,0 +1,41 @@
+// Background
+$color-bg:          #000000;
+$color-bg-alt:      #0a0a0a;
+$color-surface:     #111111;
+
+// Text
+$color-text:        #ffffff;
+$color-muted:       #747989;
+
+// Borders
+$color-border:      rgba(240, 195, 36, 0.15);
+
+// Brand
+$color-primary:     #F0C324;   // Signal Yellow — UI accents, glows, badges
+$color-primary-alt: #FCCA13;   // Live Yellow — hover variant
+$color-link:        #7A82FF;   // Electric Blue — body links only
+$color-glitch-r:    #FCCA13;   // Live Yellow (glitch channel 1)
+$color-glitch-b:    #7A82FF;   // Electric Blue (glitch channel 2)
+
+// Header / footer
+$color-header-bg:   #000000;
+$color-header-text: #ffffff;
+$color-header-muted:#747989;
+
+// Fonts
+$font-sans:    "Space Grotesk", "DM Sans", "Helvetica Neue", Arial, sans-serif;
+$font-mono:    "Lucida Console", "Courier New", monospace;
+$font-display: "Sora", "Trebuchet MS", "Segoe UI", sans-serif;
+
+$font-size-base:   1rem;
+$line-height-base: 1.7;
+$container-width:  760px;
+$spacing-unit:     1.5rem;
+
+// Badge colors
+$badges: (
+  "announcement": #F0C324,
+  "news":         #7A82FF,
+  "meeting":      #FCCA13,
+  "ctf":          #ffffff,
+);
