@@ -1,0 +1,70 @@
+@use 'variables' as *;
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: $font-sans;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  color: $color-text;
+  background: $color-bg;
+}
+
+// Scanline overlay — very subtle, adds texture without hurting readability
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent    0,
+    transparent    3px,
+    rgba(0,0,0,0.04) 3px,
+    rgba(0,0,0,0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+a {
+  color: $color-link;
+  text-decoration: none;
+
+  &:hover {
+    text-shadow: 0 0 8px $color-link;
+  }
+}
+
+img { max-width: 100%; height: auto; }
+
+code {
+  font-family: $font-mono;
+  font-size: 0.875em;
+  color: $color-primary;
+  background: $color-surface;
+  padding: 0.1em 0.4em;
+  border: 1px solid rgba($color-primary, 0.2);
+  border-radius: 2px;
+}
+
+pre {
+  font-family: $font-mono;
+  font-size: 0.875em;
+  background: $color-surface;
+  padding: $spacing-unit;
+  overflow-x: auto;
+  border-left: 2px solid $color-primary;
+
+  code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: $color-text;
+  }
+}
+
+::selection {
+  background: rgba($color-primary, 0.2);
+  color: $color-header-text;
+}
