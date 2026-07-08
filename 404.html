@@ -1,0 +1,439 @@
+---
+layout: default
+title: "404"
+permalink: /404.html
+---
+<section class="err404" aria-label="Page not found">
+
+  <div class="err404__module" id="err404-module">
+    <!-- No-JS fallback: always shows Agrippa. JS replaces this entirely. -->
+    <p class="err404__code">ERR 404 &middot; FRAGMENT NOT FOUND</p>
+    <div class="agrippa__poem" role="img"
+         aria-label="An homage to William Gibson's self-erasing poem Agrippa. The page you requested could not be found.">
+      <p class="agrippa-line">Somewhere a floppy disk</p>
+      <p class="agrippa-line">is spinning down for the last time.</p>
+      <p class="agrippa-line">&nbsp;</p>
+      <p class="agrippa-line">This was a book of the dead.</p>
+      <p class="agrippa-line">You opened it once &mdash;</p>
+      <p class="agrippa-line">now the words begin to forget themselves,</p>
+      <p class="agrippa-line">encrypting as they are read,</p>
+      <p class="agrippa-line">&nbsp;</p>
+      <p class="agrippa-line">the way silver fades</p>
+      <p class="agrippa-line">the instant light first touches it,</p>
+      <p class="agrippa-line">the way a photograph</p>
+      <p class="agrippa-line">gives back nothing but grain.</p>
+      <p class="agrippa-line">&nbsp;</p>
+      <p class="agrippa-line">The page you came for is not here.</p>
+      <p class="agrippa-line">It remembers nothing.</p>
+    </div>
+  </div>
+
+  <h1 class="err404__title">404</h1>
+  <p class="err404__sub" id="err404-sub">No such fragment. The mechanism keeps no copy.</p>
+  <p class="err404__return">
+    <a href="{{ '/' | relative_url }}">cd / &mdash; return to the surface</a><span class="err404__cursor" aria-hidden="true">_</span>
+  </p>
+  <p class="err404__attribution" id="err404-attribution">
+    <a href="https://en.wikipedia.org/wiki/Agrippa_(A_Book_of_the_Dead)" target="_blank" rel="noopener">Agrippa (A Book of the Dead) &mdash; William Gibson, 1992</a>
+  </p>
+
+</section>
+
+<script>
+(function () {
+  var root      = document.querySelector('.err404');
+  var moduleEl  = document.getElementById('err404-module');
+  var subEl     = document.getElementById('err404-sub');
+  var attribEl  = document.getElementById('err404-attribution');
+  if (!root || !moduleEl) return;
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function resolve(mod) {
+    if (subEl    && mod.sub)         subEl.textContent = mod.sub;
+    if (attribEl && mod.attribution) {
+      attribEl.innerHTML =
+        '<a href="' + esc(mod.attribution.href) + '" target="_blank" rel="noopener">' +
+        esc(mod.attribution.text) + '</a>';
+    } else if (attribEl && !mod.attribution) {
+      attribEl.style.display = 'none';
+    }
+    root.classList.add('is-resolved');
+    if (!reduce) {
+      var title = root.querySelector('.err404__title');
+      if (title) setTimeout(function () {
+        title.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 200);
+    }
+  }
+
+  // ── Shared noise glyph set (Agrippa) ─────────────────────────────────────────
+  var GLYPHS = '01░▒▓█▖▞◆▮λΣΞ#%&@*/\\<>{}[]=±§';
+  function noise() { return GLYPHS.charAt(Math.floor(Math.random() * GLYPHS.length)); }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // MODULE: Agrippa
+  // Self-erasing poem. Characters are replaced one by one with noise glyphs,
+  // sweeping left-to-right, top-to-bottom, following Gibson's original gimmick.
+  // ─────────────────────────────────────────────────────────────────────────────
+  var agrippa = {
+    sub: 'No such fragment. The mechanism keeps no copy.',
+    attribution: {
+      href: 'https://en.wikipedia.org/wiki/Agrippa_(A_Book_of_the_Dead)',
+      text: 'Agrippa (A Book of the Dead) — William Gibson, 1992'
+    },
+    run: function (el, reduce, onDone) {
+      var lines = [
+        'Somewhere a floppy disk',
+        'is spinning down for the last time.',
+        '',
+        'This was a book of the dead.',
+        'You opened it once —',
+        'now the words begin to forget themselves,',
+        'encrypting as they are read,',
+        '',
+        'the way silver fades',
+        'the instant light first touches it,',
+        'the way a photograph',
+        'gives back nothing but grain.',
+        '',
+        'The page you came for is not here.',
+        'It remembers nothing.'
+      ];
+      var html = '<p class="err404__code">ERR 404 · FRAGMENT NOT FOUND</p>';
+      html += '<div class="agrippa__poem" role="img" aria-label="An homage to Agrippa by William Gibson.">';
+      lines.forEach(function (l) {
+        html += '<p class="agrippa-line">' + (l ? esc(l) : '&nbsp;') + '</p>';
+      });
+      html += '</div>';
+      el.innerHTML = html;
+
+      if (reduce) { onDone(); return; }
+
+      var lineEls = Array.prototype.slice.call(el.querySelectorAll('.agrippa-line'));
+      var cells = [];
+      lineEls.forEach(function (line) {
+        var text = line.textContent;
+        if (!text.trim()) return;
+        line.textContent = '';
+        for (var i = 0; i < text.length; i++) {
+          var ch = text[i];
+          if (ch === ' ') { line.appendChild(document.createTextNode(' ')); continue; }
+          var span = document.createElement('span');
+          span.textContent = ch;
+          line.appendChild(span);
+          cells.push({ span: span, line: line });
+        }
+      });
+      if (!cells.length) { onDone(); return; }
+
+      var frontier    = 0;
+      var currentLine = null;
+      var shimmer     = setInterval(function () {
+        if (frontier < cells.length) cells[frontier].span.textContent = noise();
+      }, 260);
+
+      function erase() {
+        if (frontier > 0) {
+          var prev = cells[frontier - 1];
+          prev.span.textContent = noise();
+          prev.span.className = 'agrippa-char--locked';
+        }
+        if (frontier >= cells.length) {
+          clearInterval(shimmer);
+          onDone();
+          return;
+        }
+        var cell = cells[frontier];
+        cell.span.className = 'agrippa-char--decaying';
+        if (cell.line !== currentLine) {
+          currentLine = cell.line;
+          currentLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        frontier++;
+        setTimeout(erase, 128);
+      }
+      setTimeout(erase, 10000);
+    }
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // MODULE: Traceroute
+  // Simulates a traceroute that successfully reaches a few hops then times out
+  // indefinitely. The increasing timeout delays mimic waiting for a real TTL
+  // expiry on each hop.
+  // ─────────────────────────────────────────────────────────────────────────────
+  var traceroute = {
+    sub: 'connect: network is unreachable. No route to host.',
+    attribution: null,
+    run: function (el, reduce, onDone) {
+      el.innerHTML = '<p class="err404__code">ERR 404 · DESTINATION UNREACHABLE</p>' +
+                     '<div class="traceroute" id="tr-out"></div>';
+      var out = el.querySelector('#tr-out');
+
+      var hops = [
+        { text: 'traceroute to dc970.org (203.0.113.1), 30 hops max, 60 byte packets', cls: 'traceroute__header', delay: 300  },
+        { text: ' 1  _gateway (192.168.1.1)              1.234 ms  1.089 ms  0.923 ms', cls: 'traceroute__hop',    delay: 350  },
+        { text: ' 2  10.80.0.1 (10.80.0.1)               8.234 ms  8.102 ms  7.891 ms', cls: 'traceroute__hop',    delay: 350  },
+        { text: ' 3  cr1.den01.netarch.net (192.0.2.1)  14.234 ms 13.891 ms 14.102 ms', cls: 'traceroute__hop',    delay: 450  },
+        { text: ' 4  * * *',                                                              cls: 'traceroute__timeout', delay: 2200 },
+        { text: ' 5  * * *',                                                              cls: 'traceroute__timeout', delay: 1800 },
+        { text: ' 6  * * *',                                                              cls: 'traceroute__timeout', delay: 1500 },
+        { text: ' 7  * * *',                                                              cls: 'traceroute__timeout', delay: 1200 },
+        { text: ' 8  * * *',                                                              cls: 'traceroute__timeout', delay: 1000 },
+        { text: ' 9  * * *',                                                              cls: 'traceroute__timeout', delay: 800  },
+        { text: '10  * * *',                                                              cls: 'traceroute__timeout', delay: 600  },
+        { text: '',                                                                        cls: '',                   delay: 500  },
+        { text: '// connect: network is unreachable',                                     cls: 'traceroute__error',  delay: 300  },
+        { text: '// the resource has been lost in transit',                               cls: 'traceroute__error',  delay: 100  },
+      ];
+
+      function addLine(h) {
+        if (!h.text) { out.appendChild(document.createElement('br')); return; }
+        var div = document.createElement('div');
+        div.className = h.cls;
+        div.textContent = h.text;
+        out.appendChild(div);
+        div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      if (reduce) {
+        hops.forEach(addLine);
+        onDone();
+        return;
+      }
+
+      var i = 0;
+      function next() {
+        if (i >= hops.length) { setTimeout(onDone, 1000); return; }
+        var h = hops[i++];
+        setTimeout(function () { addLine(h); next(); }, h.delay);
+      }
+      next();
+    }
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // MODULE: Zork
+  // Classic text adventure that leads nowhere. Uses the actual requested URL
+  // path as the thing the user is trying to find, then traps them in a maze of
+  // twisty little passages, all alike.
+  // ─────────────────────────────────────────────────────────────────────────────
+  var zork = {
+    sub: 'You scored 0 of a possible 350. The page was never here.',
+    attribution: {
+      href: 'https://en.wikipedia.org/wiki/Zork',
+      text: 'Zork — Infocom, 1977'
+    },
+    run: function (el, reduce, onDone) {
+      el.innerHTML = '<p class="err404__code">ERR 404 · PATH NOT FOUND</p>' +
+                     '<div class="zork" id="zork-out"></div>';
+      var out = el.querySelector('#zork-out');
+
+      var rawPath  = window.location.pathname.replace(/^\/|\/$/g, '') || 'unknown';
+      var safePath = rawPath.replace(/[^\x20-\x7e]/g, '?').slice(0, 48);
+
+      // Sequence steps:
+      //   { instant, text, cls }          — appear immediately (after optional delay)
+      //   { pause, ms }                   — wait
+      //   { type, cmd, charMs }           — show "> " then type cmd character by character
+      var seq = [
+        { instant: true,  text: 'ZORK I: The Great Underground Empire',                 cls: 'zork__line' },
+        { instant: true,  text: 'Copyright (c) 1981 Infocom, Inc. All rights reserved.', cls: 'zork__line zork__line--dim' },
+        { instant: true,  text: '',                                                      cls: 'zork__line' },
+        { pause: 700 },
+        { instant: true,  text: 'You are in a maze of twisty little passages, all alike.', cls: 'zork__line zork__line--narration' },
+        { instant: true,  text: 'It is pitch black. You are likely to be eaten by a grue.', cls: 'zork__line zork__line--narration' },
+        { instant: true,  text: 'Obvious exits: none.',                                  cls: 'zork__line zork__line--narration' },
+        { instant: true,  text: '',                                                      cls: 'zork__line' },
+        { pause: 1400 },
+        { type: true,     cmd: 'ls /' + safePath,                                        charMs: 85 },
+        { pause: 350 },
+        { instant: true,  text: 'ls: cannot access ‘/' + safePath + '’: No such file or directory', cls: 'zork__line' },
+        { instant: true,  text: '',                                                      cls: 'zork__line' },
+        { pause: 1200 },
+        { type: true,     cmd: 'go north',                                               charMs: 85 },
+        { pause: 250 },
+        { instant: true,  text: 'You cannot go that way.',                               cls: 'zork__line' },
+        { instant: true,  text: '',                                                      cls: 'zork__line' },
+        { pause: 900 },
+        { type: true,     cmd: 'go south',                                               charMs: 85 },
+        { pause: 250 },
+        { instant: true,  text: 'You cannot go that way.',                               cls: 'zork__line' },
+        { instant: true,  text: '',                                                      cls: 'zork__line' },
+        { pause: 1800 },
+        { instant: true,  text: 'The grue moves closer in the dark.',                   cls: 'zork__line zork__line--narration' },
+        { instant: true,  text: '',                                                      cls: 'zork__line' },
+        { pause: 1200 },
+        { instant: true,  text: 'You scored 0 of a possible 350, using 4 moves.',       cls: 'zork__line zork__line--dim' },
+        { instant: true,  text: 'The page you came for does not exist here.',            cls: 'zork__line zork__line--dim' },
+        { pause: 900 },
+      ];
+
+      function appendLine(cls, text) {
+        var div = document.createElement('div');
+        div.className = cls;
+        div.textContent = text;
+        out.appendChild(div);
+        div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return div;
+      }
+
+      function appendPromptLine() {
+        var div = document.createElement('div');
+        div.className = 'zork__line';
+        var prompt = document.createElement('span');
+        prompt.className = 'zork__prompt';
+        prompt.textContent = '> ';
+        var cmdSpan = document.createElement('span');
+        div.appendChild(prompt);
+        div.appendChild(cmdSpan);
+        out.appendChild(div);
+        div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return cmdSpan;
+      }
+
+      if (reduce) {
+        seq.forEach(function (s) {
+          if (s.instant) { appendLine(s.cls, s.text); }
+          else if (s.type) {
+            var cs = appendPromptLine();
+            cs.textContent = s.cmd;
+          }
+        });
+        onDone();
+        return;
+      }
+
+      var i = 0;
+      function runSeq() {
+        if (i >= seq.length) { onDone(); return; }
+        var s = seq[i++];
+
+        if (s.pause) {
+          setTimeout(runSeq, s.pause);
+          return;
+        }
+        if (s.instant) {
+          appendLine(s.cls, s.text);
+          runSeq();
+          return;
+        }
+        if (s.type) {
+          var cmdSpan = appendPromptLine();
+          var chars = s.cmd.split('');
+          var j = 0;
+          var charMs = s.charMs || 85;
+          // small pre-pause before typing, like the user is deciding what to type
+          setTimeout(function typeChar() {
+            if (j >= chars.length) { runSeq(); return; }
+            cmdSpan.textContent += chars[j++];
+            setTimeout(typeChar, charMs + (Math.random() * 40 - 20));
+          }, 500);
+          return;
+        }
+      }
+      runSeq();
+    }
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // MODULE: Bad Horse
+  // The real tracert to bad.horse — a domain whose DNS is configured so the
+  // hop hostnames spell out Bad Horse Chorus lyrics from Dr. Horrible's
+  // Sing-Along Blog (2008). Lyric hops get a brighter glow as they resolve.
+  // ─────────────────────────────────────────────────────────────────────────────
+  var badhorse = {
+    sub: 'He got the application that you just sent in. It needs evaluation.',
+    attribution: {
+      href: 'https://bad.horse',
+      text: 'bad.horse — Dr. Horrible\'s Sing-Along Blog, 2008'
+    },
+    run: function (el, reduce, onDone) {
+      el.innerHTML = '<p class="err404__code">ERR 404 &middot; TRACE COMPLETE</p>' +
+                     '<div class="tracert" id="bh-out"></div>';
+      var out = el.querySelector('#bh-out');
+
+      var hops = [
+        { text: 'Tracing route to bad.horse [162.252.205.157]',              cls: 'tracert__header',      delay: 200  },
+        { text: 'over a maximum of 30 hops:',                                cls: 'tracert__header',      delay: 0    },
+        { text: '',                                                           cls: '',                     delay: 150  },
+        { text: '  1     4 ms     3 ms     3 ms  10.80.189.251',             cls: 'tracert__hop',         delay: 200  },
+        { text: '  2     *        *        *     Request timed out.',        cls: 'tracert__timeout',     delay: 500  },
+        { text: '  3     *        *        *     Request timed out.',        cls: 'tracert__timeout',     delay: 500  },
+        { text: '  4     *        *        *     Request timed out.',        cls: 'tracert__timeout',     delay: 500  },
+        { text: '  5     *        *        *     Request timed out.',        cls: 'tracert__timeout',     delay: 500  },
+        { text: '  6   140 ms    39 ms    36 ms  90.sub-69-83-115.myvzw.com [69.83.115.90]',   cls: 'tracert__hop', delay: 200 },
+        { text: '  7     *        *        *     Request timed out.',        cls: 'tracert__timeout',     delay: 500  },
+        { text: '  8    44 ms    34 ms    39 ms  190.sub-69-83-129.myvzw.com [69.83.129.190]', cls: 'tracert__hop', delay: 200 },
+        { text: '  9    55 ms    37 ms    37 ms  133.sub-69-83-129.myvzw.com [69.83.129.133]', cls: 'tracert__hop', delay: 200 },
+        { text: ' 10     *      191 ms    38 ms  lag-11.DNVRCO26-PPR01-CC.ALTER.NET [140.222.9.179]', cls: 'tracert__hop', delay: 200 },
+        { text: ' 11    50 ms    44 ms    37 ms  204.148.254.54',            cls: 'tracert__hop',         delay: 200  },
+        { text: ' 12    77 ms    54 ms    60 ms  ae3.3.bar4.Toronto1.net.lumen.tech [4.69.140.130]', cls: 'tracert__hop', delay: 200 },
+        { text: ' 13    75 ms    80 ms    72 ms  level3-gw.core02.tor1.prioritycolo.com [4.16.51.30]', cls: 'tracert__hop', delay: 200 },
+        { text: ' 14    85 ms    77 ms    80 ms  67.223.96.62 [67.223.96.62]', cls: 'tracert__hop',       delay: 200  },
+        { text: ' 15    59 ms    56 ms    63 ms  bad.horse [162.252.205.130]', cls: 'tracert__destination', delay: 350 },
+        { text: ' 16    89 ms    74 ms    69 ms  bad.horse [162.252.205.131]', cls: 'tracert__destination', delay: 350 },
+        { text: ' 17    67 ms    67 ms    78 ms  bad.horse [162.252.205.132]', cls: 'tracert__destination', delay: 350 },
+        { text: ' 18   115 ms    98 ms    95 ms  bad.horse [162.252.205.133]', cls: 'tracert__destination', delay: 350 },
+        { text: ' 19    74 ms    92 ms    75 ms  he.rides.across.the.nation [162.252.205.134]',         cls: 'tracert__lyric', delay: 750 },
+        { text: ' 20   103 ms    94 ms    99 ms  the.thoroughbred.of.sin [162.252.205.135]',            cls: 'tracert__lyric', delay: 750 },
+        { text: ' 21   277 ms    93 ms    96 ms  he.got.the.application [162.252.205.136]',             cls: 'tracert__lyric', delay: 750 },
+        { text: ' 22   258 ms   127 ms    96 ms  that.you.just.sent.in [162.252.205.137]',              cls: 'tracert__lyric', delay: 750 },
+        { text: ' 23   246 ms    98 ms    96 ms  it.needs.evaluation [162.252.205.138]',                cls: 'tracert__lyric', delay: 750 },
+        { text: ' 24   272 ms   108 ms   104 ms  so.let.the.games.begin [162.252.205.139]',             cls: 'tracert__lyric', delay: 750 },
+        { text: ' 25   242 ms   131 ms   135 ms  a.heinous.crime [162.252.205.140]',                    cls: 'tracert__lyric', delay: 750 },
+        { text: ' 26   406 ms   150 ms   182 ms  a.show.of.force [162.252.205.141]',                    cls: 'tracert__lyric', delay: 750 },
+        { text: ' 27   263 ms   136 ms   197 ms  a.murder.would.be.nice.of.course [162.252.205.142]',  cls: 'tracert__lyric', delay: 750 },
+        { text: ' 28   192 ms   124 ms   138 ms  bad.horse [162.252.205.143]', cls: 'tracert__destination', delay: 350 },
+        { text: ' 29   253 ms   127 ms   129 ms  bad.horse [162.252.205.144]', cls: 'tracert__destination', delay: 350 },
+        { text: ' 30   265 ms   187 ms   215 ms  bad.horse [162.252.205.145]', cls: 'tracert__destination', delay: 350 },
+        { text: '',                                                           cls: '',                     delay: 300  },
+        { text: 'Trace complete.',                                            cls: 'tracert__complete',    delay: 500  },
+      ];
+
+      function addLine(h) {
+        if (!h.text) { out.appendChild(document.createElement('br')); return; }
+        var div = document.createElement('div');
+        div.className = h.cls;
+        div.textContent = h.text;
+        out.appendChild(div);
+        div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      if (reduce) {
+        hops.forEach(addLine);
+        onDone();
+        return;
+      }
+
+      var i = 0;
+      function next() {
+        if (i >= hops.length) { setTimeout(onDone, 1200); return; }
+        var h = hops[i++];
+        setTimeout(function () { addLine(h); next(); }, h.delay);
+      }
+      next();
+    }
+  };
+
+  // ── Pick a random module on every page load ───────────────────────────────────
+  var MODULES = [agrippa, traceroute, zork, badhorse];
+  var chosen  = MODULES[Math.floor(Math.random() * MODULES.length)];
+
+  root.classList.add('js');
+
+  chosen.run(moduleEl, reduce, function () {
+    resolve(chosen);
+  });
+
+})();
+</script>
